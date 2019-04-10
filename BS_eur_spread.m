@@ -1,13 +1,17 @@
-function values = BS_eur_impl_fd(Sa, Sb, E, r, sigma, T, type, ns, nt)
+function values = BS_eur_spread(Sa, Sb, E1, E2, r, sigma, T, type, ns, nt)
 
 hs = (Sb-Sa) / (ns+1);
 ht = T / (nt+1);
 
 values = zeros(ns*nt, 1);
 if type == "put"
-    for i = 1:ns, values((nt-1)*ns+i,1) = max(E-i*hs,0); end
+    for i = 1:ns 
+        values((nt-1)*ns+i,1) = max(E2-i*hs,0)-max(E1-i*hs,0); 
+    end
 elseif type == "call"
-    for i = 1:ns, values((nt-1)*ns+i,1) = max(i*hs-E,0); end
+    for i = 1:ns
+        values((nt-1)*ns+i,1) = max(i*hs-E1,0)-max(i*hs-E2,0); 
+    end
 end
 
 % calculates for put option
@@ -26,9 +30,10 @@ for i = nt-1:-1:1
         % bj vector
         bj(j, 1) = values(i*ns+j, 1);
         if j == 1 && type == "put"    
-            bj(j, 1) = bj(j, 1) - left*E; 
+            bj(j, 1) = bj(j, 1) - left*(E2-E1); 
         elseif j == ns && type == "call"
-            bj(j, 1) = bj(j, 1) - right*(j*hs-E*exp(-r*(T-i*ht)));
+            bj(j, 1) = bj(j, 1) + right* ...
+                        (E1*exp(-r*(T-i*ht)) - E2*exp(-r*(T-i*ht)));
         end
     end
     uj = Aj\bj;
