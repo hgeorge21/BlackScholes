@@ -39,7 +39,6 @@ The following programs are contained here
 - scriptAmComp.m    Compares American options using SOR and without
 
 
-=================================================================
 INSTRUCTIONS
 =================================================================
 1. scripts can be run directly and graphs will be generated.
@@ -55,7 +54,6 @@ INSTRUCTIONS
     already which can be easily changed
 
 
-================================================================
 Comments and Further Possible Improvements
 ================================================================
 - I was not entirely sure about American call option since there was little
