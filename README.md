@@ -39,9 +39,9 @@ The following programs are contained here
 - scriptAmComp.m    Compares American options using SOR and without
 
 
-===========================================================================
+=================================================================
 INSTRUCTIONS
-===========================================================================
+=================================================================
 1. scripts can be run directly and graphs will be generated.
 2. Note that scriptEurPayoff can uncomment BS_eur_spread to run the bullish
     vertical spread program
@@ -55,9 +55,9 @@ INSTRUCTIONS
     already which can be easily changed
 
 
-===========================================================================
+================================================================
 Comments and Further Possible Improvements
-===========================================================================
+================================================================
 - I was not entirely sure about American call option since there was little
     information found on the internet. From what I could gather, it was
     apparently that on no divident-paying basis, the American call option 
