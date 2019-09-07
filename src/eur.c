@@ -6,11 +6,10 @@
 #include <time.h>
 
 #define MYMAX(x,y) ((x > y) ? x : y)
-#define ABSOL(x)   ((x > 0) ? x : -x)
 
 void eur() {
     double sig2 = 0.04; double E = 10; double r = 0.05;
-    double T = 1.0; double b = 50.0;
+    double T = 1.0; double b = 30.0;
     int nt = 599; double dt = (T / (double)(nt+1));
     int ns = 599; double ds = (b / (double)(ns+1));
 
@@ -44,13 +43,14 @@ void eur() {
             if(j < ns-1) Aj[main_diag+1] = right;
 
             int index = i*ns + j;
-            bj[j] = c*values[index];
-            if(j == 0)
-                bj[j] -= right*values[index+1] - 2*left*E;
-            else if(j == ns-1)
-                bj[j] -= left*values[index-1];
-            else
-                bj[j] -= (right*values[index+1]  + left*values[index-1]);
+            if(j == 0) {
+                bj[j] = c*values[index] - right*values[index+1] - 2*left*E;
+                
+            } else if(j == ns-1) {
+                bj[j] = c*values[index] - left*values[index-1];
+            } else {
+                bj[j] = c*values[index] - right*values[index+1]  - left*values[index-1];
+            }
         }
 
         double error = 1.0;
@@ -69,14 +69,15 @@ void eur() {
                 if(j < ns-1)
                     uj[j] -= Aj[m_center+1] * temp[j+1];
                 
-                if(ABSOL(Aj[m_center]) > 1E-8) {
+                if(fabs(Aj[m_center]) > 1E-8) {
                     uj[j] /= Aj[m_center];
                     uj[j] = omega*uj[j] + (1-omega)*temp[j];
                 }
             }
             double norm = 0;
             for(int j = 0; j < ns; j++) {
-                norm = MYMAX(ABSOL(uj[j]-temp[j]), norm);
+                if(fabs(uj[j]-temp[j]) > norm)
+                    norm = fabs(uj[j]-temp[j]);
             }
             
             error = norm;
@@ -85,6 +86,7 @@ void eur() {
                 temp[j] = uj[j];
         }
        
+        //for(int j = 0; j < ns; j++)
         memcpy(&values[(i-1)*ns], uj, sizeof(double)*ns);
         
     }
@@ -107,7 +109,7 @@ void eur() {
 
 
 int main() {
-    double start = clock();
+    double start = clock();// omp_get_wtime();
     eur();
     printf("%f seconds\n", (clock()-start)/ CLOCKS_PER_SEC);
 
