@@ -1,0 +1,45 @@
+function values = binary_option(Sa, Sb, E, A, r, sigma, T, type, ns, nt)
+hs = (Sb-Sa) / (ns+1);
+ht = T / (nt+1);
+
+values = zeros(ns*nt, 1);
+if type == "put"
+    for i = 1:ns
+        if E - i*hs > 0, values((nt-1)*ns+i,1) = A; 
+        else,            values((nt-1)*ns+i,1) = 0; end
+    end
+elseif type == "call"
+    for i = 1:ns
+        if i*hs - E > 0, values((nt-1)*ns+i,1) = A; 
+        else,            values((nt-1)*ns+i,1) = 0; end
+    end
+end
+
+% calculates for put option
+for i = nt-1:-1:1
+    Aj = sparse(ns, ns);
+    bj = zeros(ns, 1);
+    for j = 1:ns
+        center = 1 + sigma^2*j^2*ht + r*ht;
+        left = 1/2*r*j*ht - 1/2*sigma^2*j^2*ht;
+        right = -1/2*r*j*ht - 1/2*sigma^2*j^2*ht;
+
+        Aj(j,j) = center;
+        if j < ns, Aj(j, j+1) = right; end
+        if j > 1,  Aj(j, j-1) = left;  end
+       
+        % bj vector
+        bj(j, 1) = values(i*ns+j, 1);
+        if j == 1 && type == "put"
+            bj(j, 1) = bj(j, 1) - left *A*exp(-r*(T-i*ht));
+        elseif j == ns && type == "call"
+            bj(j, 1) = bj(j, 1) - right*A*exp(-r*(T-i*ht));            
+        end
+    end
+    uj = Aj\bj;
+    values((i-1)*ns+1 : i*ns, 1) = uj;
+end
+
+graph_surface(values, ns, nt, T, Sa, Sb, type);
+end
+
